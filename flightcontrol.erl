@@ -23,11 +23,10 @@ tower_loop(Map0) ->
                 {_, FoundPlanePid} ->
                     PlanePid ! {crash, "in air"},
                     FoundPlanePid ! {crash, "in air"},
-                    Map1 = lists:keydelete(PlanePid, 2, Map0),
-                    Map2 = lists:keydelete(FoundPlanePid, 2, Map1),
+                    Map = lists:keydelete(FoundPlanePid, 2, Map0),
                     io:format("~p [TC] Collision between ~p an ~p~n",
                               [self(), PlanePid, FoundPlanePid]),
-                    tower_loop(Map2)
+                    tower_loop(Map)
             end
     end.
 
@@ -35,15 +34,23 @@ reduce_lane(0) -> 0;
 reduce_lane(L) -> L-1.
 
 plane_loop(Speed, Distance, Lane, TowerPid) ->
-    timer:sleep(Speed),
-    TowerPid !  {get_next_lane, Distance, Lane, self()},
+    {message_queue_len,Length} = process_info(self(), message_queue_len),
+    io:format("~p [Plane] Length=~p ~n", [self(), Length]),
+    case Length of
+        0 ->
+            io:format("~p [Plane] sends get_next_lane ~n", [self()]),
+            TowerPid ! {get_next_lane, Distance, Lane, self()};
+        _ ->
+            ok
+    end,
     receive
-        {path_clear, NextLane} ->
-            plane_loop(Speed, Distance-1, NextLane, TowerPid);
+        {crash, Info} ->
+            io:format("~p [Plane] <<CRASHED>> ~p~n", [self(), Info]);
         landed ->
             io:format("~p [Plane] <<LANDED>> ~n", [self()]);
-        {crash, Info} ->
-            io:format("~p [Plane] <<CRASHED>> ~p~n", [self(), Info])
+        {path_clear, NextLane} ->
+            timer:sleep(Speed),
+            plane_loop(Speed, Distance-1, NextLane, TowerPid)
     end.
 
 %% TEST FUNCTIONS
