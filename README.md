@@ -21,10 +21,10 @@ number)
 ```
 
 ## runnning code
-1. get erlang installed (erl, erlc commands present in path)
+1. get erlang installed (erl command present in PATH)
 2. start Erlang shell with "erl" command
 3. compile and load Erlang module with "c(flightcontrol), l(flightcontrol)."
-4. start selected simulation function for example with "flightcontrol:simulate()"
+4. start selected simulation function for example with "flightcontrol:simulate()."
 
 ## references
 1. https://digitaljoel.nerd-herders.com/2011/03/31/erlang-concurrency-demo-application/
