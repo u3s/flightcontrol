@@ -21,7 +21,7 @@ number)
 ```
 
 ## runnning code
-1. get erlang installed (erl command present in PATH)
+1. get Erlang installed (erl command present in PATH)
 2. start Erlang shell with "erl" command
 3. compile and load Erlang module with "c(flightcontrol), l(flightcontrol)."
 4. start selected simulation function for example with "flightcontrol:simulate()."
