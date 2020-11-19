@@ -30,28 +30,25 @@ tower_loop(Map0) ->
             end
     end.
 
-reduce_lane(0) -> 0;
-reduce_lane(L) -> L-1.
-
 plane_loop(Speed, Distance, Lane, TowerPid) ->
-    {message_queue_len,Length} = process_info(self(), message_queue_len),
-    io:format("~p [Plane] Length=~p ~n", [self(), Length]),
-    case Length of
-        0 ->
-            io:format("~p [Plane] sends get_next_lane ~n", [self()]),
-            TowerPid ! {get_next_lane, Distance, Lane, self()};
-        _ ->
-            ok
-    end,
     receive
         {crash, Info} ->
-            io:format("~p [Plane] <<CRASHED>> ~p~n", [self(), Info]);
+            io:format("~p [Plane] <<CRASHED>> ~p~n", [self(), Info]),
+            exit(normal);
         landed ->
-            io:format("~p [Plane] <<LANDED>> ~n", [self()]);
+            io:format("~p [Plane] <<LANDED>> ~n", [self()]),
+            exit(normal);
         {path_clear, NextLane} ->
-            timer:sleep(Speed),
             plane_loop(Speed, Distance-1, NextLane, TowerPid)
+    after Speed ->
+            io:format("~p [Plane] sends get_next_lane ~n", [self()]),
+            TowerPid ! {get_next_lane, Distance, Lane, self()},
+            plane_loop(Speed, Distance, Lane, TowerPid)
     end.
+
+%% HELPERS
+reduce_lane(0) -> 0;
+reduce_lane(L) -> L-1.
 
 %% TEST FUNCTIONS
 simulate() ->
