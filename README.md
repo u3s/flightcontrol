@@ -10,6 +10,7 @@ Erlang concurrency example for educational purposes.
   - Speed (higher value - slower plane),
   - Distance - how far from there airport
   - Lane - 0 is the Lane enabling a proper landing
+6. succesfull landing happens if plane reaches {0, 0} position
      
 ```
       2  1  0 (Distance from airport)
@@ -19,6 +20,7 @@ Erlang concurrency example for educational purposes.
 (Lane
 number)    
 ```
+
 
 ## runnning code
 1. get Erlang installed (erl command present in PATH)

@@ -12,8 +12,6 @@ tower_loop(Map0) ->
             PlanePid ! {crash, "while landing"},
             tower_loop(lists:keydelete(PlanePid, 2, Map0));
         {get_next_lane, Distance, Lane, PlanePid} ->
-            io:format("~p [TC] plane~p on lane: ~p distance: ~p~n",
-                      [self(), PlanePid, Lane, Distance]),
             NextLane = reduce_lane(Lane),
             case lists:keyfind({Distance, NextLane}, 1, Map0) of
                 false ->
@@ -21,11 +19,8 @@ tower_loop(Map0) ->
                     tower_loop(lists:keystore(PlanePid, 2, Map0,
                                               {{Distance, NextLane}, PlanePid}));
                 {_, FoundPlanePid} ->
-                    PlanePid ! {crash, "in air"},
-                    FoundPlanePid ! {crash, "in air"},
+                    [P ! {crash, "in air"} || P <- [PlanePid, FoundPlanePid]],
                     Map = lists:keydelete(FoundPlanePid, 2, Map0),
-                    io:format("~p [TC] Collision between ~p an ~p~n",
-                              [self(), PlanePid, FoundPlanePid]),
                     tower_loop(Map)
             end
     end.
